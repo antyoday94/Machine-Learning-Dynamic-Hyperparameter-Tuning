@@ -38,7 +38,7 @@ def objective(trial):
     """
     # Dynamically choose the classifier using a categorical suggestion
     classifier_name = trial.suggest_categorical("classifier", ["xgb",
-                                                                # "svm",
+                                                                "svm",
                                                                   "nn"
                                                                   ])
     
@@ -60,21 +60,21 @@ def objective(trial):
             # use_label_encoder=False,  # Avoid warnings regarding label encoding
             eval_metric="logloss"     # Evaluation metric for binary classification
         )
-    # elif classifier_name == "svm":
-    #     # ---------------------------------------------------------------------
-    #     # SVM Classifier: Define model-specific hyperparameter search space
-    #     # ---------------------------------------------------------------------
-    #     c = trial.suggest_float("svm_C", 1e-3, 1e3, log=True)
-    #     kernel = trial.suggest_categorical("svm_kernel", [
-    #         # "linear",
-    #           "rbf"
-    #           ])
-    #     if kernel == "rbf":
-    #         # For RBF kernel, include gamma in the search space
-    #         gamma = trial.suggest_float("svm_gamma", 1e-4, 1e-1, log=True)
-    #         classifier = SVC(C=c, kernel=kernel, gamma=gamma, probability=True)
-    #     else:
-    #         classifier = SVC(C=c, kernel=kernel, probability=True)
+    elif classifier_name == "svm":
+        # ---------------------------------------------------------------------
+        # SVM Classifier: Define model-specific hyperparameter search space
+        # ---------------------------------------------------------------------
+        c = trial.suggest_float("svm_C", 1e-3, 1e3, log=True)
+        kernel = trial.suggest_categorical("svm_kernel", [
+            # "linear",
+              "rbf"
+              ])
+        if kernel == "rbf":
+            # For RBF kernel, include gamma in the search space
+            gamma = trial.suggest_float("svm_gamma", 1e-4, 1e-1, log=True)
+            classifier = SVC(C=c, kernel=kernel, gamma=gamma, probability=True)
+        else:
+            classifier = SVC(C=c, kernel=kernel, probability=True)
     elif classifier_name == "nn":
         # ---------------------------------------------------------------------
         # Neural Network (MLPClassifier): Define model-specific hyperparameter search space
@@ -109,7 +109,7 @@ def objective(trial):
 study = optuna.create_study(direction="maximize")
 
 # Optimize the study with a specified number of trials
-study.optimize(objective, n_trials=30)
+study.optimize(objective, n_trials=40)
 
 # ---------------------------------------------------------------------------------
 # Step 5: Display the best parameters and corresponding accuracy
